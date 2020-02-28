@@ -2,33 +2,33 @@
 
 //Uses Timer 0 Channel 4 PTE31
 void initSongPWM(void) {
-		SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
+	SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
+	
+	PORTE->PCR[PTE31_Pin] &= ~PORT_PCR_MUX_MASK;
+	PORTE->PCR[PTE31_Pin] |= PORT_PCR_MUX(3);
 
-		PORTE->PCR[PTE31_Pin] &= ~PORT_PCR_MUX_MASK;
-		PORTE->PCR[PTE31_Pin] |= PORT_PCR_MUX(3);
+	SIM_SCGC6 |= SIM_SCGC6_TPM0_MASK;
 
-		SIM_SCGC6 |= SIM_SCGC6_TPM0_MASK;
+	SIM->SOPT2 &= ~SIM_SOPT2_TPMSRC_MASK;
+	SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1);
 
-		SIM->SOPT2 &= ~SIM_SOPT2_TPMSRC_MASK;
-		SIM->SOPT2 |= SIM_SOPT2_TPMSRC(1);
+	TPM0->SC &= ~((TPM_SC_CMOD_MASK) | (TPM_SC_PS_MASK));
+	TPM0->SC |= (TPM_SC_CMOD(1) | TPM_SC_PS(7));
+	TPM0->SC &= ~(TPM_SC_CPWMS_MASK);
 
-		TPM0->SC &= ~((TPM_SC_CMOD_MASK) | (TPM_SC_PS_MASK));
-		TPM0->SC |= (TPM_SC_CMOD(1) | TPM_SC_PS(7));
-		TPM0->SC &= ~(TPM_SC_CPWMS_MASK);
-
-		TPM0_C4SC &= ~((TPM_CnSC_ELSB_MASK) | (TPM_CnSC_ELSA_MASK) | (TPM_CnSC_MSB_MASK) | (TPM_CnSC_MSB_MASK));
-		TPM0_C4SC |= (TPM_CnSC_ELSB(1) | TPM_CnSC_MSB(1));
+	TPM0_C4SC &= ~((TPM_CnSC_ELSB_MASK) | (TPM_CnSC_ELSA_MASK) | (TPM_CnSC_MSB_MASK) | (TPM_CnSC_MSB_MASK));
+	TPM0_C4SC |= (TPM_CnSC_ELSB(1) | TPM_CnSC_MSB(1));
 }
 
 //Function to set frequency
-void setFrequency(int frequency){
-		if (frequency != 0) {
-				TPM0->MOD = (375000 / frequency) -1;
-				TPM0_C4V = 375000 / (1.25*frequency);
-		} else {
-				TPM0->MOD = 0;
-				TPM0_C4V = 0;
-		}
+void setFrequency(int frequency) {
+	if (frequency != 0) {
+		TPM0->MOD = (375000 / frequency) -1;
+		TPM0_C4V = 375000 / (1.25*frequency);
+	} else {
+		TPM0->MOD = 0;
+		TPM0_C4V = 0;
+	}
 }
 
 //These notes works with 2 resistors in parallel
@@ -59,23 +59,23 @@ uint8_t back_mask(uint8_t note) {
 
 //plays a note nicely
 void play_note(int note, int duration) {
-	  setFrequency(note);
-		osDelay(duration << 6);
-		setFrequency(0);
-    osDelay(duration << 4);
+	setFrequency(note);
+	osDelay(duration << 6);
+	setFrequency(0);
+	osDelay(duration << 4);
 }
 
 //plays the music, **26 is the size of the array that were passed in, other songs need adjust values accordingly
 void play_music(uint8_t noteArr[], uint8_t durationArr[]) {
-  for (uint8_t i = 0; i < 26; i++) {
+	for (uint8_t i = 0; i < 26; i++) {
 		int note = music_hash_table(front_mask(noteArr[i]));
 		int duration = front_mask(durationArr[i]) << 2;
 		play_note(note, duration);
 		
 		note = music_hash_table(back_mask(noteArr[i]));
 		duration = back_mask(durationArr[i]) << 2;
-    play_note(note, duration);
-  }
+		play_note(note, duration);
+	}
 }
 
 //Thread to play the music, the function that will be inserted into osThreadNew()
@@ -100,13 +100,13 @@ void play_music_thread(void *argument) {
   
 	//music score
 	uint8_t note[] = {0x45, 0x61, 0x46, 0x65, 0x45, 0x88, 0x88, 0x43, 
-										 0x44, 0x44, 0x43, 0x43, 0x43, 0x21, 0x11, 0x22,
-										 0x22, 0x21, 0x01, 0x01, 0x54, 0x16, 0x66, 0x78,
-										 0x44, 0x65};
+			0x44, 0x44, 0x43, 0x43, 0x43, 0x21, 0x11, 0x22,
+			0x22, 0x21, 0x01, 0x01, 0x54, 0x16, 0x66, 0x78,
+			0x44, 0x65};
 	uint8_t duration[] = {0x11, 0x11, 0x11, 0x21, 0x11, 0x11, 0x12, 0x11,
-												0x11, 0x11, 0x21, 0x11, 0x11, 0x12, 0x11, 0x11,
-												0x11, 0x21, 0x11, 0x11, 0x13, 0x11, 0x11, 0x11,
-												0x11, 0x18};
+				0x11, 0x11, 0x21, 0x11, 0x11, 0x12, 0x11, 0x11,
+				0x11, 0x21, 0x11, 0x11, 0x13, 0x11, 0x11, 0x11,
+				0x11, 0x18};
 																
 	for(;;) {
 		play_music(note, duration);
