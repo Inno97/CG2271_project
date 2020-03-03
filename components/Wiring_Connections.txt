@@ -1,0 +1,45 @@
+===================================================================================================
+Wiring Connections:
+===================================================================================================
+
+Power Connections:
+P5-9V_VIN	(P1) - To 9V power supply
+GND 14		(P2) - To GND of 9V power supply
+
+Bluetooth module connections:
+PTE31 		(B1) - 					
+GND (14)	(B2) - Ground			
+PTE23 		(B3) - Transmit pin / leftmost pin in bluetooth module
+
+
+Motor Connections
+PTB3 		(M4) - B1 IN
+PTB2 		(M3) - B2 IN
+PTB1 		(M2) - A2 IN
+PTB0 		(M1) - A1 IN
+
+Note: Front of bot is the side where the motor driver chip is at
+
+===================================================================================================
+Board Pin Layout:
+===================================================================================================
+
+|  |  |					|  |  |
+|  |  |					|  |  |
+|  |  |					|B3|M4|
+|  |  |					|  |M3|
+|  |  |					|  |M2|
+|  |  |					|  |M1|
+|  |  |
+|  |  |					|  |P1|
+						|  |P2|
+|  |  |					|  |  |
+|  |  |					|  |  |
+|  |  |					|  |  |
+|  |  |					|  |  |
+|  |  |					|  |  |
+|  |  |					|  |  |
+|B2|B1|					
+|  |  |					
+|  |  |					
+|  |  |					
