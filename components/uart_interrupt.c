@@ -1,4 +1,4 @@
-void initUART2(uint32_t baud_rate) {
+void initUART1(uint32_t baud_rate) {
 		uint32_t divisor, bus_clock;
 		
 		SIM->SCGC4 |= SIM_SCGC4_UART2_MASK;
@@ -24,4 +24,12 @@ void initUART2(uint32_t baud_rate) {
 		UART1->C2 |= UART_C2_RIE_MASK;
 		
 		UART1->C2 |= UART_C2_RE_MASK;
+}
+
+void UART1_IRQHandler(void) {
+	NVIC_ClearPendingIRQ(UART1_IRQn);
+	if (UART1->S1 & UART_S1_RDRF_MASK) {
+	// received a character
+		rx_data = UART1->D;
+	}
 }
