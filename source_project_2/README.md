@@ -1,0 +1,5 @@
+- This version of code meets all the requirements in the project specifications; unique tone for connection and complete challenge
+- Was testing the limits of our project, loaded 4 different songs inside and it doesn't crash!
+- Axel F for complete challenge
+- Habanera for bluetooth connection
+- Deja Vu and the annoying cat song for main tune, it alternates
