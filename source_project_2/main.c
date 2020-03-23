@@ -212,7 +212,7 @@ int main (void) {
 		osThreadNew(tBrain,	NULL, NULL);    
 		osThreadNew(tConnect, NULL, NULL);
 		osThreadNew(tStaticLed, NULL, &Thread_attr); //No need thread priority at all, lol
-	    osThreadNew(tRunningLed, NULL, NULL);
+	        osThreadNew(tRunningLed, NULL, NULL);
 		osThreadNew(tEndChallenge, NULL, NULL);
 		osThreadNew(tBuzzer, NULL, NULL);
 		osThreadNew(tMotor, NULL, NULL);
