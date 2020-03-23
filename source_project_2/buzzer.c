@@ -22,6 +22,7 @@
 
 osMutexId_t buzzer_mutex;
 
+/** Sets the frequency of the pwm signal used to control buzzer */
 void setFrequency(int frequency){
 		if (frequency != 0) {
 				TPM0->MOD = (375000 / frequency) -1;
@@ -33,6 +34,7 @@ void setFrequency(int frequency){
 		
 }
 
+/** Stores the music to be played in a hash table */
 //These notes works with 2 resistors in parallel
 int music_hash_table(uint8_t note) {
 		switch(note) {
@@ -52,6 +54,7 @@ int music_hash_table(uint8_t note) {
 		return 0; //error
 }
 
+/** Stores the music to be played in a hash table */
 int music_hash_table2(uint8_t note) {
 		switch(note) {
 				case 0: return NOTE_E6;//466;
@@ -71,21 +74,25 @@ int music_hash_table2(uint8_t note) {
 		return 0; //error
 }
 
+/** Returns the first 4 bits of the 8 bit value */
 uint8_t front_mask(uint8_t note) {
 		return note >> 4;
 }
 
+/** Returns the final 4 bits of the 8 bit value */
 uint8_t back_mask(uint8_t note) {
 		return note & 0x0f;
 }
 
+/** Plays the specified note for the specified duration */
 void play_note(int note, int duration) {
-	  setFrequency(note);
-		osDelay(duration << 5);
-		setFrequency(0);
+	setFrequency(note);
+	osDelay(duration << 5);
+	setFrequency(0);
     osDelay(duration << 3);
 }
 
+/** Plays the main music */
 void play_main_music(uint8_t noteArr[], uint8_t durationArr[]) {
 	for (uint8_t i = 0; i < 26; i++) {
 		osMutexAcquire(buzzer_mutex, osWaitForever);
@@ -100,6 +107,7 @@ void play_main_music(uint8_t noteArr[], uint8_t durationArr[]) {
 	}
 }
 
+/** Beeps the buzzer */
 void beep(uint8_t noteArr[], uint8_t durationArr[], uint8_t size) {
 	osMutexAcquire(buzzer_mutex, osWaitForever);
 	for (uint8_t i = 0; i < size; i++) {
@@ -114,6 +122,7 @@ void beep(uint8_t noteArr[], uint8_t durationArr[], uint8_t size) {
 	osMutexRelease(buzzer_mutex);
 }
  
+/** Configures the pin used for PWM to play music on the buzzer */
 void initBuzzer(void) {
 		SIM_SCGC5 |= SIM_SCGC5_PORTE_MASK;
 
