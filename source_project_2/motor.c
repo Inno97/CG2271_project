@@ -18,7 +18,8 @@
 #define SPEED 200
 
 volatile uint8_t dir = 0x00;
- 
+
+/** Sets up the pins used for pwm to control the motors */ 
 void initMotor(void) {
 		SIM_SCGC5 |= SIM_SCGC5_PORTB_MASK;
 		
@@ -63,6 +64,7 @@ void initMotor(void) {
 }
 
 /* Motor Base Functions */
+/** Changes the speed of the motor used to rotate the left wheels */
 void setLeftSpeed(uint8_t percentage) {
 		if (dir & 0xF0) {
 				TPM2_C0V = 0;
@@ -73,6 +75,7 @@ void setLeftSpeed(uint8_t percentage) {
 		}
 }
 
+/** Changes the speed of the motor used to rotate the right wheels */
 void setRightSpeed(uint8_t percentage) {
 		if (dir & 0x0F) {
 				TPM1_C0V = 0;
@@ -84,6 +87,7 @@ void setRightSpeed(uint8_t percentage) {
 }
 
 // stop all PWM value
+/** All pwm pins are set to output a logic low signal */
 void stop(void) {	
 		TPM1_C0V = 0;
 		TPM1_C1V = 0;
@@ -93,12 +97,14 @@ void stop(void) {
 
 /* Advanced Motor Functions */
 // basic forward / backward
+/** Moves the robot forward */
 void forward(void) {
 		dir = UP;
 		setLeftSpeed(SPEED);
 		setRightSpeed(SPEED);
 }
 
+/** Moves the robot backward */
 void reverse(void) {
 		dir = DOWN;
 		setLeftSpeed(SPEED);
@@ -132,12 +138,14 @@ void swingLeft(void) {
 }
 
 // pivot on the spot, both wheels in opposite directions
+/** Turns the robot towards it left */
 void pivotLeft(void) {
 		dir = LEFT;
 		setLeftSpeed(125);
 		setRightSpeed(125);
 }
 
+/** Turns the robot towards it right */
 void pivotRight(void) {
 		dir = RIGHT;
 		setLeftSpeed(125);

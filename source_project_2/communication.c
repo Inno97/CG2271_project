@@ -3,7 +3,7 @@
 #define UART_RX_PORTE23 23 //rx_pin
 
 
-/* UART2 */
+/* Initializes the UART to receive commands ocer bluetooth */
 void initUART2(uint32_t baud_rate) {
 		uint32_t divisor, bus_clock;
 		

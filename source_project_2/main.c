@@ -5,11 +5,12 @@
 #include "RTE_Components.h"
 #include  CMSIS_device_header
 #include "cmsis_os2.h"
-#include "gpio.h"
-#include "motor.h"
-#include "buzzer.h"
-#include "communication.h"
-#define BAUD_RATE 9600
+#include "gpio.h"  	      	/** Contains code to control LED's */
+#include "motor.h" 			/** Contains code to control motors */
+#include "buzzer.h" 		/** Contains code to control buzzer */
+#include "communication.h"  /** Contains code to initialize UART */
+
+#define BAUD_RATE 9600      /** Baud Rate used for bluetooth communication */
 
 #define FLAG_UART_MSK 0x00000001U
 #define FLAG_RUNNING_MSK 0x00000002U
@@ -51,6 +52,7 @@ void UART2_IRQHandler(void) {
  * Application threads
  *---------------------------------------------------------------------------*/
 
+/** Thread used to play music on the buzzer */
 void tBuzzer(void *argument) {
 	uint8_t note[] = {0x09, 0x11, 0x1b, 0x0a, 0xa0, 0x03, 0x02, 0x01, 0x91, 0x11,
 		0x21, 0x22, 0x33, 0x00, 0x91, 0x11, 0x90, 0xaa, 0x00, 0x32, 0x19, 0x11, 0x12, 0x12, 0x33, 0x23};
@@ -72,6 +74,7 @@ void tBuzzer(void *argument) {
 	}
 }
 
+/** Thread to execute instructions when the chalenge is finished */
 void tEndChallenge(void * argument) {
 	uint8_t noteArr[] = {0x1f, 0x3f, 0x1f, 0x15, 0x1b, 0x1f,
 	0x7f, 0x1f, 0x18, 0x73, 0x17, 0xa1, 0xbf, 0xbc, 0x21};
@@ -83,6 +86,7 @@ void tEndChallenge(void * argument) {
 	}
 }
 
+/** Thread to execute actions required being connection via bluetooth */
 void tConnect(void *argument) {
 	uint8_t noteArr[] = {0x98, 0x77, 0x76, 0x54, 0x44, 0x32,
 	0x12, 0x10, 0x12, 0x10};
@@ -97,6 +101,7 @@ void tConnect(void *argument) {
 	}
 }
 
+/** Thread to control LED's when the robot is static */
 void tStaticLed(void *argument) {
 	while(1) {
 		osEventFlagsWait(evt_id, FLAG_STATIC_MSK, osFlagsNoClear, osWaitForever);
@@ -106,6 +111,7 @@ void tStaticLed(void *argument) {
 	}
 }
 
+/** Thread to light up green LED's sequentially when the robot is moving */
 void tRunningLed(void *argument) { //tRunning priority > tStatic
 	while(1) {
 		osEventFlagsWait(evt_id, FLAG_RUNNING_MSK, osFlagsNoClear, osWaitForever);
@@ -115,6 +121,7 @@ void tRunningLed(void *argument) { //tRunning priority > tStatic
 	}
 }
 
+/** Thread to control motor based on user's input */
 void tMotor(void *argument) {
 	while(1) {
 		osEventFlagsWait(evt_id, FLAG_MOTOR_MSK, osFlagsWaitAny, osWaitForever);
@@ -159,6 +166,7 @@ void tMotor(void *argument) {
 	}
 }
 
+/** Main thread which conrols the other threads by settting event flags */
 void tBrain(void *argument) {
 	while(1) {
 		osEventFlagsWait(evt_id, FLAG_UART_MSK, osFlagsWaitAny, osWaitForever);
@@ -191,22 +199,25 @@ int main (void) {
 		initBuzzer();
 		initMotor();
 		initUART2(BAUD_RATE);
-		// ...
+		
 		led_mutex = osMutexNew(&Thread_Mutex_attr); //No need priority inheritance
 	
 		evt_id = osEventFlagsNew(NULL);
 		osEventFlagsClear(evt_id, FLAG_ALL);
 		osEventFlagsSet(evt_id, FLAG_STATIC_MSK);
 	 
-		osKernelInitialize();                 // Initialize CMSIS-RTOS
-		osThreadNew(tBrain,	NULL, NULL);    // Create application main thread
+		osKernelInitialize();               // Initialize CMSIS-RTOS
+		
+		/** Create new threads */
+		osThreadNew(tBrain,	NULL, NULL);    
 		osThreadNew(tConnect, NULL, NULL);
 		osThreadNew(tStaticLed, NULL, &Thread_attr); //No need thread priority at all, lol
-	  osThreadNew(tRunningLed, NULL, NULL);
+	        osThreadNew(tRunningLed, NULL, NULL);
 		osThreadNew(tEndChallenge, NULL, NULL);
 		osThreadNew(tBuzzer, NULL, NULL);
 		osThreadNew(tMotor, NULL, NULL);
 	
-		osKernelStart();                      // Start thread execution
+		/** Start thread execution */
+		osKernelStart();                     
 		for (;;) {}
 }
