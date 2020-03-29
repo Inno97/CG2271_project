@@ -1,0 +1,84 @@
+@startuml
+
+
+actor "User\nBluetooth App" as User
+
+participant "Scheduler" as i
+
+participant "UART2_IRQHandler" as IRQ
+
+participant "tBrain" as b
+
+participant "tConnect" as c
+participant "tMotor" as m
+participant "tRunningLED" as r
+participant "tStaticLED" as s
+participant "tEndChallenge" as e
+participant tBuzzer
+
+activate tBuzzer
+activate i
+
+loop Challenge Not Complete
+User -> IRQ: Send Command
+activate IRQ
+
+IRQ --> i
+deactivate IRQ
+
+i -> b
+activate b
+
+
+
+alt BT Connection Command
+
+b -> c
+activate c
+
+c --> b
+deactivate c
+
+else Movement Command
+
+b -> m
+activate m
+
+alt Running
+
+m -> r
+activate r
+
+r --> m
+deactivate r
+
+else Stopped
+
+m -> s
+activate s
+
+s --> m
+deactivate s
+
+end
+
+m --> b
+deactivate m
+
+else End Challenge Command
+
+b -> e
+activate e
+
+e --> b
+deactivate e
+
+end
+
+b --> i
+deactivate b
+
+end
+deactivate tBuzzer
+
+@enduml

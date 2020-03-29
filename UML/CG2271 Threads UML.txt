@@ -1,0 +1,27 @@
+@startuml
+
+actor "User BT App" as User 
+rectangle RTOSArchitecture {
+agent "UART2_IRQHandler" as IRQ
+agent "tBuzzer"
+agent "tBrain" as b
+agent "tEndChallenge" as e
+agent "tConnect" as c
+agent "tMotor" as m
+agent "tStaticLED" as s
+agent "tRunningLED" as r
+
+
+User -right-> IRQ : Send Command
+
+IRQ -right-> b : evt_id = FLAG_UART_MSK
+
+b -up-> c : evt_id = FLAG_CONNECT_MSK
+b -right-> m : evt_id = FLAG_MOTOR_MSK
+b -down-> e : evt_id = FLAG_END_MSK
+
+m -down-> s : evt_id = FLAG_STATIC_MSK
+m -right-> r : evt_id = FLAG_RUNNING_MSK
+}
+
+@enduml
