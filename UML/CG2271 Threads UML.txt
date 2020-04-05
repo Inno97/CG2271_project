@@ -1,7 +1,11 @@
 @startuml
 
 actor "User BT App" as User 
-rectangle RTOSArchitecture {
+agent "BT06" as bt
+
+User -right-> bt : Send command over Bluetooth
+
+rectangle "RTOS Architecture (FRDM-KL25Z)" {
 agent "UART2_IRQHandler" as IRQ
 agent "tBuzzer"
 agent "tBrain" as b
@@ -11,8 +15,20 @@ agent "tMotor" as m
 agent "tStaticLED" as s
 agent "tRunningLED" as r
 
+rectangle osEventFlags {
+  agent evt_id
+}
+  
+rectangle Mutex {
+  agent led_mutex
+  agent buzzer_mutex
+}
+  
+rectangle "Global Variables" {
+  agent rx_data
+}
 
-User -right-> IRQ : Send Command
+bt -right-> IRQ : UART
 
 IRQ -right-> b : evt_id = FLAG_UART_MSK
 
