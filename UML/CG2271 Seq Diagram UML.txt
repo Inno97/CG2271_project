@@ -3,6 +3,10 @@
 
 actor "User\nBluetooth App" as User
 
+participant BT06
+
+activate BT06
+
 participant "Scheduler" as i
 
 participant "UART2_IRQHandler" as IRQ
@@ -20,7 +24,8 @@ activate tBuzzer
 activate i
 
 loop Challenge Not Complete
-User -> IRQ: Send Command
+User -> BT06: Send Command via Bluetooth
+BT06 -> IRQ: Redirect Command via UART
 activate IRQ
 
 IRQ --> i
@@ -80,5 +85,9 @@ deactivate b
 
 end
 deactivate tBuzzer
+
+deactivate BT06
+
+hide footbox
 
 @enduml
