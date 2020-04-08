@@ -28,17 +28,6 @@ osEventFlagsId_t evt_id;
 
 osMutexId_t led_mutex;
 
-const osThreadAttr_t Thread_attr = {
-	.priority = osPriorityBelowNormal
-};
-
-const osMutexAttr_t Thread_Mutex_attr = {
-  "myThreadMutex",     // human readable mutex name
-  osMutexPrioInherit,  // attr_bits
-  NULL,                // memory for control block   
-  0U                   // size for control block
-};
-
 /* UART2 Interrupt Handler */
 void UART2_IRQHandler(void) {
 		NVIC_ClearPendingIRQ(UART2_IRQn);
@@ -195,24 +184,23 @@ void tBrain(void *argument) {
 int main (void) {
 		// System Initialization
 		SystemCoreClockUpdate();
+		osKernelInitialize();               // Initialize CMSIS-RTOS
+	
 		initGPIO();
 		initBuzzer();
 		initMotor();
 		initUART2(BAUD_RATE);
 		
-		led_mutex = osMutexNew(&Thread_Mutex_attr); //No need priority inheritance
-	
+		led_mutex = osMutexNew(NULL);
 		evt_id = osEventFlagsNew(NULL);
 		osEventFlagsClear(evt_id, FLAG_ALL);
 		osEventFlagsSet(evt_id, FLAG_STATIC_MSK);
-	 
-		osKernelInitialize();               // Initialize CMSIS-RTOS
 		
 		/** Create new threads */
 		osThreadNew(tBrain,	NULL, NULL);    
 		osThreadNew(tConnect, NULL, NULL);
-		osThreadNew(tStaticLed, NULL, &Thread_attr); //No need thread priority at all, lol
-	        osThreadNew(tRunningLed, NULL, NULL);
+		osThreadNew(tStaticLed, NULL, NULL);
+		osThreadNew(tRunningLed, NULL, NULL);
 		osThreadNew(tEndChallenge, NULL, NULL);
 		osThreadNew(tBuzzer, NULL, NULL);
 		osThreadNew(tMotor, NULL, NULL);
