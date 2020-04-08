@@ -9,8 +9,6 @@
 #define PTB1_Pin 1
 #define PTB2_Pin 2
 #define PTB3_Pin 3
-#define LEFT_MOTOR_COMP 100 // Left Motor Compensation (Out of 100)
-#define RIGHT_MOTOR_COMP 100 // Right Motor Compensation
 #define UP 0x00
 #define DOWN 0xFF
 #define LEFT 0xF0
