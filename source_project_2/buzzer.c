@@ -54,7 +54,7 @@ int music_hash_table(uint8_t note) {
 		return 0; //error
 }
 
-/** Stores the music to be played in a hash table */
+/** Stores the music to be played in a hash table 2, note is actually 4 bits only */
 int music_hash_table2(uint8_t note) {
 		switch(note) {
 				case 0: return NOTE_E6;//466;
@@ -89,10 +89,10 @@ void play_note(int note, int duration) {
 	setFrequency(note);
 	osDelay(duration << 5);
 	setFrequency(0);
-    osDelay(duration << 3);
+    	osDelay(duration << 3);
 }
 
-/** Plays the main music */
+/** Plays the main music, hardcoded to optimise memory space, music can be pre-empted between notes */
 void play_main_music(uint8_t noteArr[], uint8_t durationArr[]) {
 	for (uint8_t i = 0; i < 26; i++) {
 		osMutexAcquire(buzzer_mutex, osWaitForever);
@@ -107,7 +107,7 @@ void play_main_music(uint8_t noteArr[], uint8_t durationArr[]) {
 	}
 }
 
-/** Beeps the buzzer */
+/** Beeps the buzzer, uses 2nd hashtable, hogs the buzzer resource for the entire duration */
 void beep(uint8_t noteArr[], uint8_t durationArr[], uint8_t size) {
 	osMutexAcquire(buzzer_mutex, osWaitForever);
 	for (uint8_t i = 0; i < size; i++) {
