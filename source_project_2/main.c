@@ -35,6 +35,14 @@ void UART2_IRQHandler(void) {
 			rx_data = UART2->D;
 			osEventFlagsSet(evt_id, FLAG_UART_MSK);
 		}
+		if (UART2->S1 & (UART_S1_OR_MASK |
+			UART_S1_NF_MASK |
+			UART_S1_FE_MASK |
+			UART_S1_PF_MASK)) {
+			// handle the error
+			// clear the flag
+			rx_data = UART2->D; //discards corrupted data
+		}
 }
 
 /*----------------------------------------------------------------------------
